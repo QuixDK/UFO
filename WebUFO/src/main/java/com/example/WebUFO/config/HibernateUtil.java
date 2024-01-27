@@ -1,19 +1,14 @@
-package ru.ssugt.config;
+package com.example.WebUFO.config;
 
-import com.fasterxml.classmate.AnnotationConfiguration;
-import lombok.Getter;
-import org.hibernate.Session;
+import com.example.WebUFO.model.Users;
+import com.example.WebUFO.model.UsersBills;
+import com.example.WebUFO.model.UsersData;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.internal.SessionFactoryImpl;
-import ru.ssugt.model.RecognizedText;
-import ru.ssugt.model.RecognizedVoice;
+import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+@Component
 public class HibernateUtil {
 
     private static SessionFactory sessionFactory;
@@ -29,8 +24,9 @@ public class HibernateUtil {
         if (sessionFactory == null) {
             try {
                 Configuration configuration = new Configuration().configure();
-                configuration.addAnnotatedClass(RecognizedText.class);
-                configuration.addAnnotatedClass(RecognizedVoice.class);
+                configuration.addAnnotatedClass(Users.class);
+                configuration.addAnnotatedClass(UsersBills.class);
+                configuration.addAnnotatedClass(UsersData.class);
                 StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
                 sessionFactory = configuration.buildSessionFactory(builder.build());
 

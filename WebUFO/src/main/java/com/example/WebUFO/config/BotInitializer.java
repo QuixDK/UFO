@@ -1,6 +1,6 @@
 package com.example.WebUFO.config;
 
-import com.example.WebUFO.service.UFO;
+import com.example.WebUFO.controller.UFO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -14,16 +14,19 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 @Component
 public class BotInitializer {
 
-    @Autowired
-    UFO ufo;
+    private UFO ufo;
+
+//    @Autowired
+//    public BotInitializer(UFO ufo) {
+//        this.ufo = ufo;
+//    }
 
     @EventListener({ContextRefreshedEvent.class})
     public void init() throws TelegramApiException {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         try {
             telegramBotsApi.registerBot(ufo);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Error occurred: " + e.getMessage());
         }
     }

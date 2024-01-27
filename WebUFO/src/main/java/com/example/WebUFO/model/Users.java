@@ -1,5 +1,6 @@
 package com.example.WebUFO.model;
 
+import com.example.WebUFO.controller.UserStates;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,21 +9,29 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Entity(name = "users")
-public class User {
+@Entity
+@Table(name = "users")
+public class Users {
 
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userID;
+    private Long userChatID;
 
     @Column
-    private int userState;
+    @OneToOne
+    private UserStates userState;
 
+    @Column
+    @OneToOne
+    private UsersData usersData;
 
+    @Column
+    @OneToMany
+    private UsersBills usersBills;
     @Override
     public String toString() {
-        return "User{" + userID + "}";
+        return "User{" + userChatID + "}";
 //                "chatID=" + chatID +
 //                ", userName='" + userFirstName + '\'' +
 //                ", userBalance=" + userBalance +
@@ -31,7 +40,7 @@ public class User {
 
     @Override
     public int hashCode() {
-        return getUserID();
+        return Math.toIntExact(getUserChatID());
     }
 
 

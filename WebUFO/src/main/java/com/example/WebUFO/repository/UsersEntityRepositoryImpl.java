@@ -1,52 +1,54 @@
-package ru.ssugt.repository;
+package com.example.WebUFO.repository;
 
+import com.example.WebUFO.config.HibernateUtil;
+import com.example.WebUFO.controller.UserStates;
+import com.example.WebUFO.model.Users;
+import com.example.WebUFO.model.UsersData;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import ru.ssugt.model.RecognizedText;
+import org.springframework.data.jpa.provider.HibernateUtils;
+import org.springframework.stereotype.Component;
 
-import javax.management.Query;
-import java.util.List;
+@Component
+public class UsersEntityRepositoryImpl implements UsersEntityRepository, UsersDataEntityRepository {
+    private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 
+    @Override
+    public void save(Users users) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(users);
+        transaction.commit();
+        session.close();
 
-public class RecognizedTextRepositoryImpl implements RecognizedTextRepository{
-        private final SessionFactory sessionFactory;
-
-        public RecognizedTextRepositoryImpl(SessionFactory sessionFactory) {
-            this.sessionFactory = sessionFactory;
-        }
-
-        public RecognizedText save(RecognizedText text) {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            session.save(text);
-            transaction.commit();
-            session.close();
-            return text;
-        }
-
-        public RecognizedText findById(Long id) {
-            Session session = sessionFactory.openSession();
-            RecognizedText text = session.get(RecognizedText.class, id);
-            session.close();
-            return text;
-        }
-
-        public List<RecognizedText> findAll() {
-            Session session = sessionFactory.openSession();
-            String query = "FROM RecognizedText where 1=1 ORDER BY id DESC";
-            List<RecognizedText> texts = session.createQuery(query, RecognizedText.class).list();
-            session.close();
-            return texts;
-        }
-
-        public void delete(RecognizedText text) {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            session.delete(text);
-            transaction.commit();
-            session.close();
-        }
     }
+
+    @Override
+    public void updateUserState(Users user, UserStates userStates) {
+        Session session = sessionFactory.openSession();
+        session.evict(user);
+        user.setUserState(userStates);
+        Users user2 = (Users) session.merge(user);
+        session.close();
+    }
+
+    @Override
+    public Users findUserById(Long chatID) {
+        Session session = sessionFactory.openSession();
+        Users users = session.get(Users.class, chatID);
+        session.close();
+        return users;
+    }
+
+    @Override
+    public void saveData(UsersData usersData) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(usersData);
+        transaction.commit();
+        session.close();
+    }
+}
 
 

@@ -1,4 +1,4 @@
-package com.example.WebUFO.service;
+package com.example.WebUFO.controller;
 
 public enum UserStates {
     StateStart,

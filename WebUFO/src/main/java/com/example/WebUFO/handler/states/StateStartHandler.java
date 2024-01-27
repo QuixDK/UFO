@@ -1,18 +1,27 @@
-package com.example.WebUFO.handler;
+package com.example.WebUFO.handler.states;
 
 import com.example.WebUFO.controller.UserStates;
+import com.example.WebUFO.handler.commands.StartCommandHandler;
+import com.example.WebUFO.handler.messages.Messages;
 import com.example.WebUFO.model.Users;
+import com.example.WebUFO.service.UsersServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class StateStartHandler {
 
-    public void handle(String textMessage, Users user) {
-        if (textMessage.equals("/start")) {
-            catchStartCommand(chatID, firstName);
-            user.setUserState(UserStates.StateMenu);
-            executeDbUpdate(SendMenuState, chatID);
-            sendStartMessage(chatID);
+    @Autowired
+    UsersServiceImpl usersService;
+    Messages messages = new Messages();
+    StartCommandHandler startCommandHandler = new StartCommandHandler();
+
+    public void handle(Update update, Users user) {
+        if (update.getMessage().getText().equals("/start")) {
+            startCommandHandler.catchStartCommand(user, user.getUsersData().getUserFirstName());
+            usersService.updateUserState(user, UserStates.StateMenu);
+            messages.sendStartMessage(user);
         } else {
-            sendErrorMessage(chatID);
+            messages.sendErrorMessage(user);
         }
     }
 }
