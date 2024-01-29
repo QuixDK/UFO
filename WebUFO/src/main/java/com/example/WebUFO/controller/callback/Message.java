@@ -6,6 +6,7 @@ import com.example.WebUFO.model.Users;
 import com.example.WebUFO.model.UsersBills;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -17,48 +18,50 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Component
 public class Message {
 
-    @Autowired
-    UFO ufo;
-
-    public void send(Users user, String text) {
+    public SendMessage send(Users user, String text) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setParseMode("HTML");
         sendMessage.setText(text);
-        sendMessage.setChatId(user.getUserChatID());
+        sendMessage.setChatId(user.getChatId());
         setMenuButton(sendMessage);
-        UsersBills usersBills = user.getUsersBills();
+        //UsersBills usersBills = user.getUsersBills();
 
             if (user.getUserState() == UserStates.StateMenu) {
                 try {
-                    ufo.execute(setInlineMenuButtons(sendMessage));
-                    log.info("Message: " + text + " send to " + user.getUserChatID());
+                    log.info("Message: " + text + " send to " + user.getChatId());
+                    return setInlineMenuButtons(sendMessage);
+
                 } catch (Exception e) {
                     log.error("Error occurred: " + e.getMessage());
                 }
             } else if (user.getUserState() == UserStates.StateTrade) {
                 try {
-                    ufo.execute(setTradeInlineButtons(sendMessage));
-                    log.info("Message: " + text + " send to " + user.getUserChatID());
+                    log.info("Message: " + text + " send to " + user.getChatId());
+                    return setTradeInlineButtons(sendMessage);
+
                 } catch (Exception e) {
                     log.error("Error occurred: " + e.getMessage());
                 }
             } else if (user.getUserState() == UserStates.StatePayment) {
                 try {
-                    ufo.execute(setPayButtons(sendMessage, usersBills.getPayUrl()));
-                    log.info("Message: " + text + " send to " + user.getUserChatID());
+                    log.info("Message: " + text + " send to " + user.getChatId());
+                    return setPayButtons(sendMessage, "null"); //usersBills.getPayUrl()));
+
                 } catch (Exception e) {
                     log.error("Error occurred: " + e.getMessage());
                 }
             } else
                 try {
-                    ufo.execute(sendMessage);
-                    log.info("Message: " + text + " send to " + user.getUserChatID());
+                    log.info("Message: " + text + " send to " + user.getChatId());
+                    return sendMessage;
+
                 } catch (Exception e) {
                     log.error("Error occurred: " + e.getMessage());
                 }
-
+        return sendMessage;
     }
     private SendMessage setInlineMenuButtons(SendMessage sendMessage) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();

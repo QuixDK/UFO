@@ -18,7 +18,6 @@ public class UsersServiceImpl implements UsersService {
     private final UsersEntityRepository usersEntityRepository;
     private final UsersDataEntityRepository usersDataEntityRepository;
 
-
     @Override
     public void updateUserState(Users users, UserStates userState) {
         usersEntityRepository.updateUserState(users, userState);
@@ -32,13 +31,14 @@ public class UsersServiceImpl implements UsersService {
         UsersData usersData = new UsersData();
 
         users.setUserState(UserStates.StateStart);
-        users.setUserChatID(chatID);
+        users.setChatId(chatID);
         usersEntityRepository.save(users);
 
         String firstName = update.getMessage().getChat().getFirstName();
         String secondName = update.getMessage().getChat().getLastName();
         String userName = update.getMessage().getChat().getUserName();
 
+        usersData.setChatId(chatID);
         usersData.setUserName(userName);
         usersData.setUserFirstName(firstName);
         usersData.setUserSecondName(secondName);
@@ -48,8 +48,13 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public Users findUserById(Long id) {
-        return usersEntityRepository.findUserById(id);
+    public Users findUserByChatId(Long id) {
+        return usersEntityRepository.findUserByChatId(id);
+    }
+
+    @Override
+    public UsersData findUsersDataByChatId(Long id) {
+        return usersDataEntityRepository.findUsersDataByChatId(id);
     }
 
 }

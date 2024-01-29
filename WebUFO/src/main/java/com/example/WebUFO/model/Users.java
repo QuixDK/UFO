@@ -16,22 +16,22 @@ public class Users {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userChatID;
+    private Long userId;
 
     @Column
-    @OneToOne
+    private Long chatId;
+
+    @Column
     private UserStates userState;
 
     @Column
-    @OneToOne
-    private UsersData usersData;
+    private Long usersDataId;
 
     @Column
-    @OneToMany
-    private UsersBills usersBills;
+    private Long usersBillsId;
     @Override
     public String toString() {
-        return "User{" + userChatID + "}";
+        return "User{" + chatId + "}";
 //                "chatID=" + chatID +
 //                ", userName='" + userFirstName + '\'' +
 //                ", userBalance=" + userBalance +
@@ -40,7 +40,7 @@ public class Users {
 
     @Override
     public int hashCode() {
-        return Math.toIntExact(getUserChatID());
+        return Math.toIntExact(getChatId());
     }
 
 

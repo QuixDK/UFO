@@ -3,9 +3,11 @@ package com.example.WebUFO.config;
 import com.example.WebUFO.controller.UFO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -14,12 +16,11 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 @Component
 public class BotInitializer {
 
-    private UFO ufo;
+    private final UFO ufo;
 
-//    @Autowired
-//    public BotInitializer(UFO ufo) {
-//        this.ufo = ufo;
-//    }
+    public BotInitializer(UFO ufo) {
+        this.ufo = ufo;
+    }
 
     @EventListener({ContextRefreshedEvent.class})
     public void init() throws TelegramApiException {

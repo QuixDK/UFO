@@ -6,33 +6,28 @@ import com.example.WebUFO.controller.callback.CallBack;
 import com.example.WebUFO.handler.messages.Messages;
 import com.example.WebUFO.handler.states.StateStartHandler;
 import com.example.WebUFO.model.Users;
-import com.example.WebUFO.repository.UsersEntityRepository;
 
 import com.example.WebUFO.service.UsersServiceImpl;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-import java.util.*;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 @Component
+@Configurable
+@AllArgsConstructor
 public class UFO extends TelegramLongPollingBot {
 
     private final BotConfig config;
-    private final UsersEntityRepository usersEntityRepository;
-    private Messages messages = new Messages();
+    private final StateStartHandler stateStartHandler;
+    private final Messages messages;
+    private final CallBack callBack;
     private final UsersServiceImpl usersService;
-
-
-    public UFO(BotConfig config, UsersEntityRepository usersEntityRepository, UsersServiceImpl usersService) {
-        this.config = config;
-        this.usersEntityRepository = usersEntityRepository;
-        this.usersService = usersService;
-
-    }
 
     @Override
     public String getBotUsername() {
@@ -48,15 +43,20 @@ public class UFO extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         boolean updateHasMessage = update.hasMessage() && update.getMessage().hasText();
         boolean updateHasCallBackQuery = update.hasCallbackQuery();
-        if (updateHasMessage) {
-            Users user = checkUser(update);
-            sendAnswer(user, update);
-        } else if (updateHasCallBackQuery) {
-            CallBack callBack = new CallBack();
-            Users user = usersEntityRepository.findUserById(update.getCallbackQuery().getMessage().getChatId());
-            if (user != null) {
-                callBack.send(update);
+        try {
+            if (updateHasMessage) {
+                Users user = checkUser(update);
+                execute(sendAnswer(user, update));
+            } else if (updateHasCallBackQuery) {
+
+                Users user = usersService.findUserByChatId(update.getCallbackQuery().getMessage().getChatId());
+                if (user != null) {
+                    execute(callBack.send(update));
+
+                }
             }
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -64,55 +64,35 @@ public class UFO extends TelegramLongPollingBot {
         return user.getUserState();
     }
 
-    private void sendAnswer(Users user, Update update) {
+    private SendMessage sendAnswer(Users user, Update update) {
 
         UserStates userState = checkUserState(user);
         String textMessage = update.getMessage().getText();
         if (userState == UserStates.StateStart) {
-            StateStartHandler stateStartHandler = new StateStartHandler();
-            stateStartHandler.handle(update, user);
-        } else if (userState == UserStates.StatePayment) {
-            if (isNumber(textMessage)) {
-                //createBill(textMessage,chatID);
-            } else {
-                if (textMessage.equals("Меню")) {
-                    usersService.updateUserState(user, UserStates.StateMenu);
-                    messages.sendStartMessage(user);
-                }
-                // else
-                //sendMessage(chatID, "<b>Введите число!</b>");
-            }
-        } else {
+            return stateStartHandler.handle(update, user);
+        }
+        else {
             if (textMessage.equals("Меню")) {
                 user.setUserState(UserStates.StateMenu);
-
-                messages.sendStartMessage(user);
+                return messages.sendStartMessage(user);
             } else {
-                messages.sendErrorMessage(user);
+                return messages.sendErrorMessage(user);
             }
         }
 
-    }
-
-    private boolean isNumber(String textMessage) {
-        try {
-            Integer.parseInt(textMessage);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private Users checkUser(Update update) {
         Long chatID = update.getMessage().getChatId();
+        Users users = usersService.findUserByChatId(chatID);
         //If exist return Users
-        if (usersEntityRepository.findUserById(chatID) != null) {
-            return usersEntityRepository.findUserById(chatID);
+        if (users != null) {
+            return users;
         }
         //Else create new Users
-        Users user = usersService.saveUser(chatID, update);
+        users = usersService.saveUser(chatID, update);
         log.info("New user with chat ID: " + chatID + " saved!");
-        return user;
+        return users;
     }
 
 }

@@ -8,6 +8,6 @@ import org.springframework.stereotype.Component;
 
 public interface UsersEntityRepository {
     void updateUserState(Users users, UserStates userStates);
-    Users findUserById(Long chatID);
+    Users findUserByChatId(Long chatID);
     void save(Users users);
 }

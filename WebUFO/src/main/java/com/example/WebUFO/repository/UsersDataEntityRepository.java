@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UsersDataEntityRepository {
     void saveData(UsersData usersData);
+    UsersData findUsersDataByChatId(Long id);
 }

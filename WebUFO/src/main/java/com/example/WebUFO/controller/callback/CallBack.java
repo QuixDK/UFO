@@ -5,37 +5,42 @@ import com.example.WebUFO.handler.messages.Messages;
 import com.example.WebUFO.model.Users;
 import com.example.WebUFO.repository.UsersEntityRepository;
 import com.example.WebUFO.service.UsersServiceImpl;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.io.Serializable;
 import java.util.Optional;
 
+@Component
+@AllArgsConstructor
 public class CallBack {
 
-    @Autowired
-    UsersEntityRepository usersEntityRepository;
+    private final UsersEntityRepository usersEntityRepository;
+    private final UsersServiceImpl usersService;
+    private final Messages messages;
 
-    @Autowired
-    UsersServiceImpl usersService;
 
-    Messages messages = new Messages();
-
-    public void send(Update update) {
+    public BotApiMethod<? extends Serializable> send(Update update) {
         Long chatID = update.getCallbackQuery().getMessage().getChatId();
         String callbackQueryMessage = update.getCallbackQuery().getData();
 
-        Users user = usersEntityRepository.findUserById(chatID);
+        Users user = usersEntityRepository.findUserByChatId(chatID);
         if (user == null) {
-            return;
+            return null;
         }
 
         switch (user.getUserState()) {
             case StateMenu -> {
-                menuStateHandle(callbackQueryMessage, user);
+                return menuStateHandle(callbackQueryMessage, user);
             }
             case StateTrade -> {
-                tradeStateHandle(update, user);
+                return tradeStateHandle(update, user);
             }
             case StatePayment -> {
 
@@ -52,43 +57,52 @@ public class CallBack {
             }
 
         }
+        return null;
     }
 
-    private void menuStateHandle(String CallbackQueryMessage, Users users) {
+    private SendMessage menuStateHandle(String CallbackQueryMessage, Users users) {
         switch (CallbackQueryMessage) {
-            case "Profile" -> messages.sendProfileInfo(users);
-            case "BotInfo" -> messages.sendBotInfo(users);
-            case "License" -> messages.sendBotLicense(users);
+            case "Profile" -> {
+                return messages.sendProfileInfo(users);
+            }
+            case "BotInfo" -> {
+                return messages.sendBotInfo(users);
+            }
+            case "License" -> {
+                return messages.sendBotLicense(users);
+            }
             case "StartTrade" -> {
                 usersService.updateUserState(users, UserStates.StateTrade);
-                messages.startTrade(users);
+                return messages.startTrade(users);
             }
             case "replenishBalance" -> {
                 users.setUserState(UserStates.StatePayment);
                 usersService.updateUserState(users, UserStates.StatePayment);
-                messages.sendPaymentMessage(users);
+                return messages.sendPaymentMessage(users);
             }
         }
+        return null;
     }
 
-    private void tradeStateHandle(Update update, Users user) {
+    private EditMessageText tradeStateHandle(Update update, Users user) {
         String CallbackQueryMessage = update.getCallbackQuery().getData();
         EditMessageText editMessageText = new EditMessageText();
         Integer messageID = update.getCallbackQuery().getMessage().getMessageId();
-        Long chatID = user.getUserChatID();
+        Long chatID = user.getChatId();
         switch (CallbackQueryMessage) {
             case "Binance" -> {
                 usersService.updateUserState(user, UserStates.StateTradeBinance);
-                messages.TradeBinance(chatID, editMessageText, messageID);
+                return messages.TradeBinance(chatID, editMessageText, messageID);
             }
             case "ByBit" -> {
                 usersService.updateUserState(user, UserStates.StateTradeByBit);
-                messages.TradeByBit(chatID, editMessageText, messageID);
+                return messages.TradeByBit(chatID, editMessageText, messageID);
             }
             case "YoBit" -> {
                 usersService.updateUserState(user, UserStates.StateTradeYoBit);
-                messages.TradeYoBit(chatID, editMessageText, messageID);
+                return messages.TradeYoBit(chatID, editMessageText, messageID);
             }
         }
+        return null;
     }
 }
