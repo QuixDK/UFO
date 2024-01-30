@@ -19,15 +19,11 @@
         <property name="show_sql">true</property>
 
         <!-- Update database on startup -->
-        <property name="hibernate.hbm2ddl.auto">update</property>
-
+        <property name="hibernate.hbm2ddl.auto">create-drop</property>
         <!-- Annotated entity classes -->
-        <mapping class="com.example.WebUFO.model.Users"/>
-        <mapping class="com.example.WebUFO.model.UsersData"/>
-        <mapping class="com.example.WebUFO.model.UsersBills"/>
-
-
-
+        <mapping class="com.quixdk.UFOBot.model.Users"/>
+        <mapping class="com.quixdk.UFOBot.model.UsersData"/>
+        <mapping class="com.quixdk.UFOBot.model.UsersBills"/>
 
     </session-factory>
 </hibernate-configuration>
