@@ -24,42 +24,23 @@ public class MessageButtons {
         sendMessage.setText(text);
         sendMessage.setChatId(user.getChatId());
         setMenuButton(sendMessage);
-        //UsersBills usersBills = user.getUsersBills();
 
-            if (user.getUserState() == UserStates.StateMenu) {
-                try {
-                    log.info("Message: " + text + " send to " + user.getChatId());
-                    return setInlineMenuButtons(sendMessage);
-
-                } catch (Exception e) {
-                    log.error("Error occurred: " + e.getMessage());
-                }
-            } else if (user.getUserState() == UserStates.StateTrade) {
-                try {
-                    log.info("Message: " + text + " send to " + user.getChatId());
-                    return setTradeInlineButtons(sendMessage);
-
-                } catch (Exception e) {
-                    log.error("Error occurred: " + e.getMessage());
-                }
-            } else if (user.getUserState() == UserStates.StatePayment) {
-                try {
-                    log.info("Message: " + text + " send to " + user.getChatId());
-                    return setPayButtons(sendMessage, "null"); //usersBills.getPayUrl()));
-
-                } catch (Exception e) {
-                    log.error("Error occurred: " + e.getMessage());
-                }
-            } else
-                try {
-                    log.info("Message: " + text + " send to " + user.getChatId());
-                    return sendMessage;
-
-                } catch (Exception e) {
-                    log.error("Error occurred: " + e.getMessage());
-                }
+        if (user.getUserState() == UserStates.StateMenu) {
+            log.info("Message: " + text + " send to " + user.getChatId());
+            return setInlineMenuButtons(sendMessage);
+        } else if (user.getUserState() == UserStates.StateTrade) {
+            log.info("Message: " + text + " send to " + user.getChatId());
+            return setTradeInlineButtons(sendMessage);
+        } else if (user.getUserState() == UserStates.StatePayment) {
+            log.info("Message: " + text + " send to " + user.getChatId());
+            return setPayButtons(sendMessage, "null"); //usersBills.getPayUrl()));
+        } else
+            log.info("Message: " + text + " send to " + user.getChatId());
         return sendMessage;
+
+
     }
+
     private SendMessage setInlineMenuButtons(SendMessage sendMessage) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();

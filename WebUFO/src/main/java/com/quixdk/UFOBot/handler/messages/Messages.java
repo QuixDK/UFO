@@ -23,7 +23,7 @@ public class Messages {
     }
 
     public SendMessage sendPaymentBill(Users users, String url) {
-        String answer = "<b> Ваша ссылка на оплату: \n</b>" + "Ссылка: " + url;
+        String answer = "<b> Ваша ссылка на оплату: </b>\nСсылка: " + url;
         return messageButtons.set(users, answer);
     }
 
@@ -39,10 +39,11 @@ public class Messages {
 
     public SendMessage sendProfileInfo(Users users) {
         UsersData usersData = usersService.findUsersDataByChatId(users.getChatId());
-        String answer = "<b>Ваше имя: </b>" + usersData.getUserFirstName() + " \n"
-                + "<b>Ваш chatID: </b>" + users.getChatId() + " \n"
-                + "<b>Ваш баланс: </b>" + usersData.getUserBalance() + " <b> рублей</b> ";
-        return messageButtons.set(users, answer);
+        StringBuilder sb = new StringBuilder();
+        sb.append("<b>Ваше имя: </b>").append(usersData.getUserFirstName()).append("\n").append(
+                "\n").append("<b>Ваш chatID: </b>").append(users.getChatId()).append("\n").append(
+                "<b>Ваш баланс: </b>").append(usersData.getUserBalance()).append(" <b> рублей</b> ");
+        return messageButtons.set(users, sb.toString());
 
     }
 
@@ -67,14 +68,8 @@ public class Messages {
         editMessageText.setMessageId((int) messageID);
         editMessageText.setText(answerBinance);
         editMessageText.setParseMode("HTML");
-        try {
-            log.info("Message: " + answerBinance + " send to " + chatID);
-            return editMessageText;
-
-        } catch (Exception e) {
-            log.error("Error occurred: " + e.getMessage());
-            return editMessageText;
-        }
+        log.info("Message: " + answerBinance + " send to " + chatID);
+        return editMessageText;
     }
 
     public EditMessageText TradeByBit(long chatID, EditMessageText editMessageText, long messageID) {
@@ -83,13 +78,9 @@ public class Messages {
         editMessageText.setMessageId((int) messageID);
         editMessageText.setText(answerBybit);
         editMessageText.setParseMode("HTML");
-        try {
-            log.info("Message: " + answerBybit + " send to " + chatID);
-            return editMessageText;
-        } catch (Exception e) {
-            log.error("Error occurred: " + e.getMessage());
-            return editMessageText;
-        }
+        log.info("Message: " + answerBybit + " send to " + chatID);
+        return editMessageText;
+
     }
 
     public EditMessageText TradeYoBit(long chatID, EditMessageText editMessageText, long messageID) {
@@ -98,12 +89,8 @@ public class Messages {
         editMessageText.setMessageId((int) messageID);
         editMessageText.setText(answerYobit);
         editMessageText.setParseMode("HTML");
-        try {
-            log.info("Message: " + answerYobit + " send to " + chatID);
-            return editMessageText;
-        } catch (Exception e) {
-            log.error("Error occurred: " + e.getMessage());
-            return editMessageText;
-        }
+        log.info("Message: " + answerYobit + " send to " + chatID);
+        return editMessageText;
+
     }
 }

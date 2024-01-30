@@ -6,6 +6,7 @@ import com.quixdk.UFOBot.model.UserStates;
 import com.quixdk.UFOBot.model.Users;
 import com.quixdk.UFOBot.service.UsersService;
 import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -16,9 +17,8 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class StartCommandHandler {
 
-    private final MessageButtons messageButtons;
+public class StartCommandHandler {
 
     private final UsersService usersService;
     private final Messages messages;
@@ -34,16 +34,9 @@ public class StartCommandHandler {
         if (update.getMessage().getText().equals("/start")) {
             String username = usersService.findUsersDataByChatId(user.getChatId()).getUserFirstName();
             usersService.updateUserState(user, UserStates.StateMenu);
-            SendMessage sendMessage = messages.sendStartMessage(user);
-            SendMessage startMessage = catchStartCommand(user, username);
-            ArrayList<SendMessage> startMessages = new ArrayList<>();
-            startMessages.add(startMessage);
-            startMessages.add(sendMessage);
-            return startMessages;
+            return List.of(catchStartCommand(user, username), messages.sendStartMessage(user));
         } else {
-            ArrayList<SendMessage> errorlist = new ArrayList<>();
-            errorlist.add(messages.sendErrorMessage(user));
-            return errorlist;
+            return List.of(messages.sendErrorMessage(user));
         }
     }
 }

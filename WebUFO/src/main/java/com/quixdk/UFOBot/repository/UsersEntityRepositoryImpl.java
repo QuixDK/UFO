@@ -31,8 +31,6 @@ public class UsersEntityRepositoryImpl implements UsersEntityRepository, UsersDa
         session.update(user);
         Transaction transaction = session.beginTransaction();
         transaction.commit();
-//        String query = "UPDATE Users u SET u.userState = " + userStates + " where m.chatId = " + user.getChatId();
-//        session.createQuery(query);
         session.close();
     }
 

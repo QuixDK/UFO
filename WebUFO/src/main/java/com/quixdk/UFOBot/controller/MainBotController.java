@@ -71,7 +71,6 @@ public class MainBotController extends TelegramLongPollingBot {
             for (var message: startCommandHandler.handle(update, user)) {
                 execute(message);
             }
-
         }
         else {
             if (textMessage.equals("Меню")) {
