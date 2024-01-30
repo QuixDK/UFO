@@ -10,7 +10,7 @@
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
         <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/UFO</property>
         <property name="hibernate.connection.username">postgres</property>
-        <property name="hibernate.connection.password">${DB_PASSWORD}</property>
+        <property name="hibernate.connection.password">inspector</property>
 
         <!-- SQL dialect -->
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
@@ -19,12 +19,11 @@
         <property name="show_sql">true</property>
 
         <!-- Update database on startup -->
-        <property name="hibernate.hbm2ddl.auto">update</property>
-
+        <property name="hibernate.hbm2ddl.auto">create-drop</property>
         <!-- Annotated entity classes -->
-        <mapping class="com.example.WebUFO.model.Users"/>
-        <mapping class="com.example.WebUFO.model.UsersData"/>
-        <mapping class="com.example.WebUFO.model.UsersBills"/>
+        <mapping class="com.quixdk.UFOBot.model.Users"/>
+        <mapping class="com.quixdk.UFOBot.model.UsersData"/>
+        <mapping class="com.quixdk.UFOBot.model.UsersBills"/>
 
     </session-factory>
 </hibernate-configuration>
